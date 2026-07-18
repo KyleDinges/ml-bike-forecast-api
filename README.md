@@ -47,6 +47,8 @@ The one-record example supports prediction and evaluation, while correctly repor
 
 This is a self-contained historical model deployment and governance demonstration, not a claim of validated current Washington DC demand forecasting. The committed UCI observations span 2011-2012, and all reported metrics are from chronological splits of that period.
 
+The rationale behind the baseline, promotion policy, intervals, drift treatment, and deliberately limited tuning is documented in [Modeling decisions](docs/modeling-decisions.md).
+
 ### Deliberate design boundaries
 
 - **No request-time training:** training produces an approved, versioned artifact; the API only serves that artifact.
@@ -118,7 +120,7 @@ Run training locally from the committed source data:
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-dev.txt
 python -m scripts.train
 python -m scripts.verify_artifact
 python -m pytest -q
