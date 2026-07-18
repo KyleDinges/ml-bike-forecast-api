@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bike Demand Forecast API</title>
+    <style>
+      :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; background:#101522; color:#e8edf7; }
+      body { margin:0; } main { max-width:1000px; margin:auto; padding:3rem 1.25rem; }
+      h1 { margin-bottom:.4rem; } .lede { color:#aab6cc; max-width:780px; }
+      section { background:#1a2233; border:1px solid #34415a; border-radius:14px; padding:1.25rem; margin-top:1.25rem; }
+      textarea, button { box-sizing:border-box; font:inherit; margin-top:.4rem; }
+      textarea { width:100%; padding:.65rem; border-radius:7px; border:1px solid #4b5c7c; background:#111827; color:inherit; }
+      textarea { min-height:260px; resize:vertical; } button { padding:.7rem 1rem; border:0; border-radius:7px; cursor:pointer; background:#79a8ff; color:#071323; font-weight:700; }
+      pre { overflow:auto; white-space:pre-wrap; } .hint { color:#aab6cc; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Bike Demand Forecast API</h1>
+      <p class="lede">A model-governed historical deployment demo based on 2011-2012 Capital Bikeshare data. Compare the approved model with its baseline and score explicit feature inputs.</p>
+      <p class="hint">This demonstrates historical-model inference, not validated current DC operations forecasting. Prediction intervals are empirical 90% intervals from validation residuals, not guaranteed confidence intervals.</p>
+
+      <section><h2>Approved model</h2><pre id="model">Loading model metadata…</pre></section>
+
+      <section>
+        <h2>Feature Input Scoring</h2>
+        <p class="hint">Submit complete, deterministic UCI-compatible weather features. The example includes an actual value so evaluation metrics are shown.</p>
+        <textarea id="feature-json" aria-label="Feature input JSON"></textarea>
+        <p><button id="run-feature">Run feature scoring</button></p>
+      </section>
+
+      <section><h2>Response</h2><p id="status" class="hint"></p><pre id="output">Run feature scoring to see results.</pre></section>
+      <p class="hint">Interactive API documentation: <a href="/docs">/docs</a></p>
+    </main>
+    <script>
+      const output = document.querySelector('#output'); const status = document.querySelector('#status');
+      const show = body => output.textContent = JSON.stringify(body, null, 2);
+      async function request(url, body) {
+        status.textContent = 'Running…';
+        try { const response = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)}); const json = await response.json(); show(json); status.textContent = response.ok ? `Done (${json.model_metadata.approved_model}).` : json.error?.message || 'Request failed.'; }
+        catch (error) { status.textContent = error.message; }
+      }
+      document.querySelector('#run-feature').onclick = () => { try { request('/v1/forecasts', JSON.parse(document.querySelector('#feature-json').value)); } catch (error) { status.textContent = `Invalid JSON: ${error.message}`; } };
+      Promise.all([fetch('/v1/model').then(r => r.json()), fetch('/v1/example-request').then(r => r.json())]).then(([model, example]) => { show(model); document.querySelector('#model').textContent = JSON.stringify(model, null, 2); document.querySelector('#feature-json').value = JSON.stringify(example.feature_input, null, 2); }).catch(error => { document.querySelector('#model').textContent = error.message; });
+    </script>
+  </body>
+</html>

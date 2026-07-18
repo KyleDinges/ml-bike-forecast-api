@@ -1,0 +1,19 @@
+# Python and test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local environments and configuration
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Editor and OS metadata
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
